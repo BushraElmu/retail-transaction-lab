@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Compiled application output
+dist/
+build/
+*.tsbuildinfo
+
+# Tooling and caches
+.vite/
+.cache/
+.eslintcache
+
+# Testing
+coverage/
+playwright-report/
+test-results/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Logs and temporary files
+*.log
+*.tmp
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# macOS
+.DS_Store
+._*
+
+# Editor-specific state
+.idea/
+.vscode/
+*.swp
+*.swo
