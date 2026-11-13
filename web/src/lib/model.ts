@@ -20,13 +20,13 @@ export type ActorDraft = {
 	basket: BasketItemDraft[];
 };
 
-/* export type CustomerProfile = {
+export type CustomerProfile = {
 	id: string;
 	username: string;
 	firstName: string;
 	lastName: string;
 	email: string;
-}; */
+};
 
 export function createDefaultInventory(): InventoryDraft[] {
 	return [

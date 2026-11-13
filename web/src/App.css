@@ -1,6 +1,27 @@
-.app {
-	width: 100%;
-	max-width: 64rem;
-	margin-inline: auto;
-	padding: 1.5rem;
+.app section {
+	margin-block: 1.5rem;
+}
+
+.actor-panel {
+	padding: 1rem;
+	border: 1px solid #d1d5db;
+	border-radius: 0.5rem;
+}
+
+.form-row {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	margin-block: 0.75rem;
+}
+
+.form-row input[type="number"] {
+	width: 6rem;
+}
+
+button,
+select,
+input {
+	font: inherit;
 }
