@@ -9,16 +9,18 @@ import {
 } from "./lib/model";
 import "./App.css";
 import { CUSTOMERS } from "./lib/customers";
-import InventoryEditor from "./components/InventoryEditor";
-import ActorEditor from "./components/ActorEditor";
+import CheckoutWorkspace from "./components/CheckoutWorkspace";
+import ObservationWorkspace from "./components/ObservationWorkspace";
+import ConfigurationWorkspace from "./components/ConfigurationWorkspace";
+
+type Workspace = "configure" | "checkout" | "observe";
 
 export default function App() {
 	// 1. State
 	const [inventory, setInventory] = useState<InventoryDraft[]>(createDefaultInventory);
-
 	const [actors, setActors] = useState<ActorDraft[]>(createDefaultActors);
-
 	const [mode, setMode] = useState<ExecutionMode>("single");
+	const [workspace, setWorkspace] = useState<Workspace>("configure");
 
 	// 2. Derived Values
 	const productCount = inventory.length;
@@ -173,94 +175,65 @@ export default function App() {
 		<main className="app">
 			<h1>Retail Transaction Lab</h1>
 
-			<InventoryEditor
-				inventory={inventory}
-				productCount={productCount}
-				totalAvailable={totalAvailable}
-				onQuantityChange={handleInventoryQuantityChange}
-				onReset={handleResetInventory}
-			/>
-
-			<section aria-labelledby="execution-heading">
-				<h2 id="execution-heading">Execution configuration</h2>
-
-				<fieldset>
-					<legend>Number of customers</legend>
-
-					<label>
-						<input
-							type="radio"
-							name="actor-count"
-							checked={actorCount === 1}
-							onChange={() => handleActorCountChange(1)}
-						/>
-						1 customer
-					</label>
-
-					<label>
-						<input
-							type="radio"
-							name="actor-count"
-							checked={actorCount === 2}
-							onChange={() => handleActorCountChange(2)}
-						/>
-						2 customers
-					</label>
-				</fieldset>
-
-				{actorCount === 2 && (
-					<div className="form-row">
-						<label htmlFor="execution-method">Execution method:</label>
-
-						<select
-							id="execution-method"
-							value={mode}
-							onChange={(event) =>
-								handleModeChange(event.target.value === "sequential" ? "sequential" : "concurrent")
-							}
-						>
-							<option value="concurrent">Concurrent</option>
-							<option value="sequential">Sequential</option>
-						</select>
-					</div>
-				)}
-
-				<p>Switching to one customer removes Actor B and their basket.</p>
-			</section>
-
-			<section aria-labelledby="actors-heading">
-				<h2 id="actors-heading">Selected customers and baskets</h2>
-
-				{actors.map((actor) => (
-					<ActorEditor
-						key={actor.actorId}
-						actor={actor}
-						customers={CUSTOMERS}
-						inventory={inventory}
-						takenCustomerIds={actors
-							.filter((other) => other.actorId !== actor.actorId)
-							.map((other) => other.customerId)}
-						onCustomerChange={handleCustomerChange}
-						onAddProduct={handleAddProduct}
-						onQuantityChange={handleBasketQuantityChange}
-						onRemoveProduct={handleRemoveProduct}
-					/>
-				))}
-			</section>
-
-			<section aria-labelledby="summary-heading">
-				<h2 id="summary-heading">Draft summary</h2>
-
-				<p>Execution mode: {mode}</p>
-				<p>Active actors: {actorCount}</p>
-				<p>Basket lines: {basketLineCount}</p>
-
-				<p>This configuration is frontend-only. No checkout has been executed.</p>
-
-				<button type="button" onClick={handleResetDraft}>
-					Reset entire draft
+			<nav className="workspace-nav" aria-label="Lab workspaces">
+				<button
+					type="button"
+					aria-pressed={workspace === "configure"}
+					onClick={() => setWorkspace("configure")}
+				>
+					{" "}
+					Configure
 				</button>
-			</section>
+				<button
+					type="button"
+					aria-pressed={workspace === "checkout"}
+					onClick={() => setWorkspace("checkout")}
+				>
+					{" "}
+					Checkout
+				</button>
+				<button
+					type="button"
+					aria-pressed={workspace === "observe"}
+					onClick={() => setWorkspace("observe")}
+				>
+					{" "}
+					Observe
+				</button>
+			</nav>
+
+			{workspace === "configure" && (
+				<ConfigurationWorkspace
+					inventory={inventory}
+					actors={actors}
+					mode={mode}
+					productCount={productCount}
+					totalAvailable={totalAvailable}
+					actorCount={actorCount}
+					basketLineCount={basketLineCount}
+					onInventoryQuantityChange={handleInventoryQuantityChange}
+					onResetInventory={handleResetInventory}
+					onActorCountChange={handleActorCountChange}
+					onModeChange={handleModeChange}
+					onCustomerChange={handleCustomerChange}
+					onAddProduct={handleAddProduct}
+					onBasketQuantityChange={handleBasketQuantityChange}
+					onRemoveProduct={handleRemoveProduct}
+					onResetDraft={handleResetDraft}
+					onReview={() => setWorkspace("checkout")}
+				/>
+			)}
+
+			{workspace === "checkout" && (
+				<CheckoutWorkspace
+					inventory={inventory}
+					actors={actors}
+					mode={mode}
+					onEdit={() => setWorkspace("configure")}
+				/>
+			)}
+
+			{workspace === "observe" && <ObservationWorkspace />}
 		</main>
 	);
 }
