@@ -1,17 +1,16 @@
-
 const INSPECTORS = [
 	{
-		title: "Event timeline",
+		title: "Event Timeline",
 		description:
 			"Review recorded execution stages and distinguish Actor A, Actor B, and shared events.",
 	},
 	{
-		title: "Transaction inspector",
+		title: "Transaction Inspector",
 		description:
 			"Inspect recorded SQL statements, parameters, returned values, row counts, and errors.",
 	},
 	{
-		title: "Database-state inspector",
+		title: "Database-state Inspector",
 		description:
 			"Compare recorded inventory, orders, and order-items observations at known points.",
 	},
@@ -19,16 +18,11 @@ const INSPECTORS = [
 
 export default function ObservationWorkspace() {
 	return (
-		<section
-			className="observation-workspace"
-			aria-labelledby="observe-heading"
-		>
+		<section className="observation-workspace" aria-labelledby="observe-heading">
 			<header className="workspace-heading workspace-lead">
-				<h2 id="observe-heading">Execution & observability</h2>
+				<h2 id="observe-heading">Execution & Observability</h2>
 
-				<p>
-					Inspect recorded outcomes and evidence from checkout executions.
-				</p>
+				<p>Inspect recorded outcomes and evidence from checkout executions.</p>
 			</header>
 
 			<div className="observation-empty">
@@ -37,10 +31,7 @@ export default function ObservationWorkspace() {
 				<p>Not Implemented Yet</p>
 			</div>
 
-			<section
-				className="observation-planned"
-				aria-labelledby="planned-heading"
-			>
+			<section className="observation-planned" aria-labelledby="planned-heading">
 				<div className="planned-heading">
 					<h3 id="planned-heading">Planned Inspection Views</h3>
 				</div>

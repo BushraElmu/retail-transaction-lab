@@ -1,4 +1,3 @@
-
 import type { ActorDraft, ExecutionMode, InventoryDraft } from "../lib/model";
 import { CUSTOMERS } from "../lib/customers";
 
@@ -6,6 +5,7 @@ type CheckoutWorkspaceProps = {
 	inventory: InventoryDraft[];
 	actors: ActorDraft[];
 	mode: ExecutionMode;
+	issueCount: number;
 	onEdit: () => void;
 };
 
@@ -19,18 +19,16 @@ export default function CheckoutWorkspace({
 	inventory,
 	actors,
 	mode,
+	issueCount,
 	onEdit,
 }: CheckoutWorkspaceProps) {
-	const basketLineCount = actors.reduce(
-		(total, actor) => total + actor.basket.length,
-		0,
-	);
+	const basketLineCount = actors.reduce((total, actor) => total + actor.basket.length, 0);
 
 	return (
 		<section className="checkout-workspace" aria-labelledby="checkout-heading">
 			<header className="workspace-heading workspace-lead">
-				<h2 id="checkout-heading">Review checkout</h2>
-				<p>Check the proposed requests before execution.</p>
+				<h2 id="checkout-heading">Review Checkout</h2>
+				<p>Review the customer and basket configuration.</p>
 			</header>
 
 			<div className="checkout-overview" aria-label="Checkout summary">
@@ -38,53 +36,39 @@ export default function CheckoutWorkspace({
 					<span>Execution</span>
 					<strong>{EXECUTION_LABELS[mode]}</strong>
 				</div>
-
 				<div>
 					<span>Customers</span>
 					<strong>{actors.length}</strong>
 				</div>
-
 				<div>
-					<span>Basket lines</span>
+					<span>Basket Lines</span>
 					<strong>{basketLineCount}</strong>
 				</div>
 			</div>
 
 			<div className="checkout-columns">
-				<section
-					className="surface-panel"
-					aria-labelledby="checkout-requests-heading"
-				>
-					<h3 id="checkout-requests-heading">Customer requests</h3>
-
+				<section className="surface-panel" aria-labelledby="checkout-requests-heading">
+					<h3 id="checkout-requests-heading">Customer Requests</h3>
 					<div className="checkout-actor-list">
 						{actors.map((actor) => {
-							const customer = CUSTOMERS.find(
-								(profile) => profile.id === actor.customerId,
-							);
-
-							if (customer === undefined) {
-								throw new Error(`Unknown customer: ${actor.customerId}`);
-							}
+							const customer = CUSTOMERS.find((profile) => profile.id === actor.customerId);
+							const customerName = customer
+								? `${customer.firstName} ${customer.lastName} (${customer.id})`
+								: `Unknown customer (${actor.customerId})`;
 
 							return (
 								<section className="checkout-actor" key={actor.actorId}>
 									<header className="checkout-actor-heading">
 										<h4>Actor {actor.actorId}</h4>
-
-										<span>
-											{customer.firstName} {customer.lastName} ({customer.id})
-										</span>
+										<span>{customerName}</span>
 									</header>
-
 									{actor.basket.length === 0 ? (
-										<p className="muted-text">No products selected.</p>
+										<p className="muted-text">Basket empty</p>
 									) : (
 										<ul className="checkout-lines">
 											{actor.basket.map((item) => (
 												<li key={item.key}>
 													<span>{item.productId}</span>
-
 													<span>
 														Requested: <strong>{item.quantity}</strong>
 													</span>
@@ -98,16 +82,8 @@ export default function CheckoutWorkspace({
 					</div>
 				</section>
 
-				<section
-					className="surface-panel"
-					aria-labelledby="checkout-inventory-heading"
-				>
-					<h3 id="checkout-inventory-heading">Draft inventory</h3>
-
-					<p className="section-intro">
-						Availability configured for this draft.
-					</p>
-
+				<section className="surface-panel" aria-labelledby="checkout-inventory-heading">
+					<h3 id="checkout-inventory-heading">Inventory</h3>
 					<div className="table-scroll">
 						<table className="data-table">
 							<thead>
@@ -116,7 +92,6 @@ export default function CheckoutWorkspace({
 									<th scope="col">Available</th>
 								</tr>
 							</thead>
-
 							<tbody>
 								{inventory.map((item) => (
 									<tr key={item.key}>
@@ -132,17 +107,24 @@ export default function CheckoutWorkspace({
 
 			<footer className="checkout-footer">
 				<div className="checkout-notice">
-					<strong>Preview only</strong>
-
+					<strong className="checkout-notice">Preview only</strong>
 				</div>
-
 				<div className="checkout-actions">
 					<button type="button" onClick={onEdit}>
-						Edit configuration
+						Edit Configuration
 					</button>
-
-					<button type="button" className="primary-action" disabled>
-						Execute checkout
+					<button
+						type="button"
+						className="primary-action checkout-execute-button"
+						aria-disabled="true"
+						aria-describedby={issueCount > 0 ? "checkout-config-warning" : undefined}
+					>
+						{issueCount > 0 && (
+							<span className="validation-indicator" aria-hidden="true">
+								!
+							</span>
+						)}
+						Confirm
 					</button>
 				</div>
 			</footer>
