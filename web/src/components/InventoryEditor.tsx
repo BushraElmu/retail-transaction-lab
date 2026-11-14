@@ -15,33 +15,54 @@ export default function InventoryEditor({
 	onQuantityChange,
 	onReset,
 }: InventoryEditorProps) {
-	return (
-		<section aria-labelledby="inventory-heading">
-			<h2 id="inventory-heading">Inventory</h2>
+  return (
+		<section className="inventory-editor" aria-labelledby="inventory-heading">
+			<header className="inventory-header">
+				<h2 id="inventory-heading">Inventory</h2>
 
-			<p>Products: {productCount}</p>
-			<p>Total available units: {totalAvailable === null ? "Invalid quantity" : totalAvailable}</p>
+				<button type="button" className="quiet-action" onClick={onReset}>
+					Reset inventory
+				</button>
+			</header>
 
-			<ul>
-				{inventory.map((item) => (
-					<li key={item.key}>
-						<label htmlFor={`stock-${item.key}`}>{item.productId}: </label>
+			<p className="inventory-summary">
+				{productCount} {productCount === 1 ? "product" : "products"} ·{" "}
+				{totalAvailable === null ? "Invalid quantity" : `${totalAvailable} units available`}
+			</p>
 
-						<input
-							id={`stock-${item.key}`}
-							type="number"
-							min="0"
-							step="1"
-							value={item.available}
-							onChange={(event) => onQuantityChange(item.key, event.target.value)}
-						/>
-					</li>
-				))}
-			</ul>
+			<div className="table-scroll">
+				<table className="inventory-table">
+					<thead>
+						<tr>
+							<th scope="col">Product ID</th>
+							<th scope="col">Available</th>
+						</tr>
+					</thead>
 
-			<button type="button" onClick={onReset}>
-				Reset
-			</button>
+					<tbody>
+						{inventory.map((item) => (
+							<tr key={item.key}>
+								<td>
+									<label htmlFor={`stock-${item.key}`}>{item.productId}</label>
+								</td>
+
+								<td>
+									<input
+										id={`stock-${item.key}`}
+										type="number"
+										min="0"
+										step="1"
+										value={item.available}
+										onChange={(event) =>
+											onQuantityChange(item.key, event.target.value)
+										}
+									/>
+								</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
 		</section>
 	);
-}
+  }

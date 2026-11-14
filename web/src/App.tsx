@@ -173,6 +173,8 @@ export default function App() {
 	// 8. Interface
 	return (
 		<main className="app">
+
+		<header className="app-header">
 			<h1>Retail Transaction Lab</h1>
 
 			<nav className="workspace-nav" aria-label="Lab workspaces">
@@ -181,26 +183,27 @@ export default function App() {
 					aria-pressed={workspace === "configure"}
 					onClick={() => setWorkspace("configure")}
 				>
-					{" "}
 					Configure
 				</button>
+
 				<button
 					type="button"
 					aria-pressed={workspace === "checkout"}
 					onClick={() => setWorkspace("checkout")}
 				>
-					{" "}
 					Checkout
 				</button>
+
 				<button
 					type="button"
 					aria-pressed={workspace === "observe"}
 					onClick={() => setWorkspace("observe")}
 				>
-					{" "}
 					Observe
 				</button>
 			</nav>
+		</header>
+
 
 			{workspace === "configure" && (
 				<ConfigurationWorkspace

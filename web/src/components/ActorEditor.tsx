@@ -1,4 +1,4 @@
-import { useState } from "react";
+
 import type { ActorDraft, ActorId, CustomerProfile, InventoryDraft } from "../lib/model";
 
 type ActorEditorProps = {
@@ -23,8 +23,6 @@ export default function ActorEditor({
 	onQuantityChange,
 	onRemoveProduct,
 }: ActorEditorProps) {
-	const [selectedProduct, setSelectedProduct] = useState("");
-
 	const availableProducts = inventory.filter(
 		(product) => !actor.basket.some((item) => item.productId === product.productId),
 	);
@@ -33,45 +31,42 @@ export default function ActorEditor({
 		(customer) => customer.id === actor.customerId || !takenCustomerIds.includes(customer.id),
 	);
 
-	function handleAddProduct() {
-		if (!selectedProduct) {
-			return;
-		}
-
-		onAddProduct(actor.actorId, selectedProduct);
-		setSelectedProduct("");
-	}
-
 	return (
 		<section className="actor-panel" aria-labelledby={`actor-${actor.actorId}-heading`}>
-			<h3 id={`actor-${actor.actorId}-heading`}>Actor {actor.actorId}</h3>
+			<header className="actor-header">
+				<h3 id={`actor-${actor.actorId}-heading`}>Actor {actor.actorId}</h3>
 
-			<div className="form-row">
-				<label htmlFor={`customer-${actor.actorId}`}>Customer:</label>
+				<div className="actor-customer-control">
+					<label htmlFor={`customer-${actor.actorId}`}>Customer</label>
 
-				<select
-					id={`customer-${actor.actorId}`}
-					value={actor.customerId}
-					onChange={(event) => onCustomerChange(actor.actorId, event.target.value)}
-				>
-					{selectableCustomers.map((customer) => (
-						<option key={customer.id} value={customer.id}>
-							{customer.firstName} {customer.lastName} ({customer.id})
-						</option>
-					))}
-				</select>
-			</div>
+					<select
+						id={`customer-${actor.actorId}`}
+						value={actor.customerId}
+						onChange={(event) => onCustomerChange(actor.actorId, event.target.value)}
+					>
+						{selectableCustomers.map((customer) => (
+							<option key={customer.id} value={customer.id}>
+								{customer.firstName} {customer.lastName}
+							</option>
+						))}
+					</select>
+				</div>
+			</header>
 
-			<h4>Basket</h4>
+			<div className="actor-basket">
+				<p className="basket-status">
+					{actor.basket.length === 0
+						? "Basket empty"
+						: `Basket · ${actor.basket.length} ${
+								actor.basket.length === 1 ? "product" : "products"
+							}`}
+				</p>
 
-			{actor.basket.length === 0 ? (
-				<p>No products selected.</p>
-			) : (
-				<ul>
-					{actor.basket.map((item) => (
-						<li key={item.key}>
-							<div className="form-row">
-								<label htmlFor={`quantity-${item.key}`}>{item.productId}:</label>
+				{actor.basket.length > 0 && (
+					<ul className="basket-lines">
+						{actor.basket.map((item) => (
+							<li key={item.key}>
+								<label htmlFor={`quantity-${item.key}`}>{item.productId}</label>
 
 								<input
 									id={`quantity-${item.key}`}
@@ -84,25 +79,37 @@ export default function ActorEditor({
 									}
 								/>
 
-								<button type="button" onClick={() => onRemoveProduct(actor.actorId, item.key)}>
+								<button
+									type="button"
+									className="quiet-action"
+									onClick={() => onRemoveProduct(actor.actorId, item.key)}
+								>
 									Remove
 								</button>
-							</div>
-						</li>
-					))}
-				</ul>
-			)}
+							</li>
+						))}
+					</ul>
+				)}
+			</div>
 
-			<div className="form-row">
-				<label htmlFor={`add-product-${actor.actorId}`}>Add product:</label>
+			<div className="actor-add-product">
+				<label htmlFor={`add-product-${actor.actorId}`}>Add product</label>
 
 				<select
 					id={`add-product-${actor.actorId}`}
-					value={selectedProduct}
+					value=""
 					disabled={availableProducts.length === 0}
-					onChange={(event) => setSelectedProduct(event.target.value)}
+					onChange={(event) => {
+						const productId = event.target.value;
+
+						if (productId !== "") {
+							onAddProduct(actor.actorId, productId);
+						}
+					}}
 				>
-					<option value="">Choose a product</option>
+					<option value="">
+						{availableProducts.length === 0 ? "No products to add" : "Choose a product"}
+					</option>
 
 					{availableProducts.map((product) => (
 						<option key={product.key} value={product.productId}>
@@ -110,10 +117,6 @@ export default function ActorEditor({
 						</option>
 					))}
 				</select>
-
-				<button type="button" disabled={!selectedProduct} onClick={handleAddProduct}>
-					Add item
-				</button>
 			</div>
 		</section>
 	);

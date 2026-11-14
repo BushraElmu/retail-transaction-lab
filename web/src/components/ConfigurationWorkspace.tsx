@@ -48,52 +48,50 @@ export default function ConfigurationWorkspace({
 	onResetDraft,
 	onReview,
 }: ConfigureWorkspaceProps) {
-	return (
-		<>
-			<InventoryEditor
-				inventory={inventory}
-				productCount={productCount}
-				totalAvailable={totalAvailable}
-				onQuantityChange={onInventoryQuantityChange}
-				onReset={onResetInventory}
-			/>
 
-			<section aria-labelledby="execution-heading">
-				<h2 id="execution-heading">Execution configuration</h2>
+  return (
+	<div className="configuration-workspace">
+		<section className="configuration-execution" aria-labelledby="execution-heading">
+			<h2 id="execution-heading">Execution Configuration</h2>
 
-				<fieldset>
-					<legend>Number of customers</legend>
+			<div className="configuration-controls">
+				<fieldset className="customer-count-control">
+					<legend>Number of Customers</legend>
 
-					<label>
-						<input
-							type="radio"
-							name="actor-count"
-							checked={actorCount === 1}
-							onChange={() => onActorCountChange(1)}
-						/>
-						1 customer
-					</label>
+					<div className="customer-count-buttons">
+						<button
+							type="button"
+							aria-pressed={actorCount === 1}
+							onClick={() => {
+								if (actorCount !== 1) onActorCountChange(1);
+							}}
+						>
+							1 customer
+						</button>
 
-					<label>
-						<input
-							type="radio"
-							name="actor-count"
-							checked={actorCount === 2}
-							onChange={() => onActorCountChange(2)}
-						/>
-						2 customers
-					</label>
+						<button
+							type="button"
+							aria-pressed={actorCount === 2}
+							onClick={() => {
+								if (actorCount !== 2) onActorCountChange(2);
+							}}
+						>
+							2 customers
+						</button>
+					</div>
 				</fieldset>
 
 				{actorCount === 2 && (
-					<div className="form-row">
-						<label htmlFor="execution-method">Execution method:</label>
+					<div className="execution-method-control">
+						<label htmlFor="execution-method">Execution Method</label>
 
 						<select
 							id="execution-method"
 							value={mode}
 							onChange={(event) =>
-								onModeChange(event.target.value === "sequential" ? "sequential" : "concurrent")
+								onModeChange(
+									event.target.value === "sequential" ? "sequential" : "concurrent",
+								)
 							}
 						>
 							<option value="concurrent">Concurrent</option>
@@ -101,47 +99,65 @@ export default function ConfigurationWorkspace({
 						</select>
 					</div>
 				)}
+			</div>
 
-				<p>Switching to one customer removes Actor B and their basket.</p>
+		</section>
+
+		<div className="configuration-columns">
+			<div className="configuration-inventory">
+				<InventoryEditor
+					inventory={inventory}
+					productCount={productCount}
+					totalAvailable={totalAvailable}
+					onQuantityChange={onInventoryQuantityChange}
+					onReset={onResetInventory}
+				/>
+			</div>
+
+			<section className="configuration-actors" aria-labelledby="actors-heading">
+				<h2 id="actors-heading">Customers & Baskets</h2>
+
+				<div className="configuration-actor-list">
+					{actors.map((actor) => (
+						<ActorEditor
+							key={actor.actorId}
+							actor={actor}
+							customers={CUSTOMERS}
+							inventory={inventory}
+							takenCustomerIds={actors
+								.filter((other) => other.actorId !== actor.actorId)
+								.map((other) => other.customerId)}
+							onCustomerChange={onCustomerChange}
+							onAddProduct={onAddProduct}
+							onQuantityChange={onBasketQuantityChange}
+							onRemoveProduct={onRemoveProduct}
+						/>
+					))}
+				</div>
 			</section>
+		</div>
 
-			<section aria-labelledby="actors-heading">
-				<h2 id="actors-heading">Selected customers and baskets</h2>
 
-				{actors.map((actor) => (
-					<ActorEditor
-						key={actor.actorId}
-						actor={actor}
-						customers={CUSTOMERS}
-						inventory={inventory}
-						takenCustomerIds={actors
-							.filter((other) => other.actorId !== actor.actorId)
-							.map((other) => other.customerId)}
-						onCustomerChange={onCustomerChange}
-						onAddProduct={onAddProduct}
-						onQuantityChange={onBasketQuantityChange}
-						onRemoveProduct={onRemoveProduct}
-					/>
-				))}
-			</section>
+		<footer className="configuration-footer">
+			<p className="configuration-summary">
+				<strong>Current setup</strong>
 
-			<section aria-labelledby="summary-heading">
-				<h2 id="summary-heading">Draft summary</h2>
+				<span>
+					{actorCount} {actorCount === 1 ? "customer" : "customers"} · {mode} ·{" "}
+					{productCount} products · {basketLineCount} basket lines
+				</span>
+			</p>
 
-				<p>Execution mode: {mode}</p>
-				<p>Active actors: {actorCount}</p>
-				<p>Basket lines: {basketLineCount}</p>
-
-				<p>This configuration is frontend-only. No checkout has been executed.</p>
-
+			<div className="configuration-actions">
 				<button type="button" onClick={onResetDraft}>
-					Reset entire draft
+					Reset setup
 				</button>
-			</section>
 
-			<button type="button" onClick={onReview}>
-				Review Checkout
-			</button>
-		</>
-	);
+				<button type="button" className="primary-action" onClick={onReview}>
+					Review checkout
+				</button>
+			</div>
+		</footer>
+	</div>
+  );
 }
